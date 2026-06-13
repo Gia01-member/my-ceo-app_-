@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>偉人CEO診断プロ：あなたの経営者タイプは？</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --light: #ecf0f1;
+            --accent-outcome: #e74c3c; /* 織田信長 (Outcome) */
+            --accent-process: #27ae60; /* 徳川家康 (Process) */
+            --accent-relation: #f1c40f; /* 豊臣秀吉 (Relation) */
+            --accent-value: #2980b9; /* 坂本龍馬 (Value) */
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            margin: 0;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            transition: opacity 0.5s ease;
+            margin: 20px 0;
+            box-sizing: border-box;
+        }
+
+        #start-view, #result-view { text-align: center; }
+        #start-view h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        #start-view .subtitle { font-size: 1.2rem; color: var(--light); margin-bottom: 2rem; line-height: 1.6; }
+        
+        .progress-bar {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background-color: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #quiz-view h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--light); line-height: 1.6; text-align: left; }
+        #choices-view { display: grid; gap: 1rem; }
+
+        .choice-button {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 1.1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .choice-button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        #ceo-name { font-size: 3rem; margin: 0.5rem 0; }
+        #ceo-catchphrase { font-size: 1.2rem; font-style: italic; color: var(--light); margin-bottom: 1.5rem; line-height: 1.5; }
+        #ceo-description, #ceo-reward, #ceo-advice { text-align: left; background-color: rgba(0, 0, 0, 0.2); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; line-height: 1.6; }
+        #ceo-reward strong, #ceo-advice strong { display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
+
+        /* 📊 【新設】スタイリッシュ横棒グラフのスタイル */
+        .chart-container {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: var(--light);
+            text-align: center;
+        }
+        .bar-group {
+            margin-bottom: 1rem;
+        }
+        .bar-group:last-child {
+            margin-bottom: 0;
+        }
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+        .bar-track {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            height: 16px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%; /* JSで動的に変更 */
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.1, 1, 0.1, 1); /* 開いた時にスッと伸びるアニメーション */
+        }
+        /* 各タイプ別のメーター色 */
+        .fill-outcome { background-color: var(--accent-outcome); }
+        .fill-process { background-color: var(--accent-process); }
+        .fill-relation { background-color: var(--accent-relation); }
+        .fill-value { background-color: var(--accent-value); }
+
+        /* 逆質問＆アンケートフォーム */
+        .feedback-section {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: left;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+        .feedback-section h3 { margin-top: 0; font-size: 1.2rem; color: #3498db; }
+        .feedback-section p { font-size: 0.9rem; color: var(--light); margin-bottom: 1rem; }
+        .feedback-textarea {
+            width: 100%;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            resize: none;
+            box-sizing: border-box;
+            margin-bottom: 0.8rem;
+        }
+        .feedback-textarea:focus { border-color: #3498db; outline: none; }
+        .btn-submit-feedback {
+            background-color: #34495e;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .btn-submit-feedback:hover { background-color: #3498db; border-color: #3498db; }
+
+        /* 誘導バナー（CTA） */
+        .cta-section {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            border: 2px solid #3498db;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .cta-section p { margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: bold; line-height: 1.5; }
+        .btn-link {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        .btn-link:hover { background-color: #2980b9; }
+
+        .action-group { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
+        @media (min-width: 480px) { .action-group { grid-template-columns: repeat(3, 1fr); } }
+
+        .btn { color: white; border: none; padding: 1rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
+        #start-button { background-color: var(--secondary); font-size: 1.2rem; padding: 1rem 2rem; border: none; color: white; cursor: pointer; font-weight: bold; border-radius: 8px; }
+        #start-button:hover { background-color: #c0392b; }
+        .btn-restart { background-color: #7f8c8d; }
+        .btn-restart:hover { background-color: #95a5a6; }
+        .btn-download { background-color: #2980b9; }
+        .btn-download:hover { background-color: #3498db; }
+        .btn-share { background-color: #27ae60; }
+        .btn-share:hover { background-color: #2ecc71; }
+
+        .hidden { display: none !important; opacity: 0; }
+        @media (max-width: 600px) { #start-view h1 { font-size: 2rem; } #ceo-name { font-size: 2.2rem; } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="start-view">
+    <h1>偉人CEO診断 プロ</h1>
+    <p class="subtitle">10の質問であなたの「ビジネス報酬系」を完全解析！<br>あなたの中に眠る経営者は誰だ？</p>
+    <button id="start-button">診断を開始する</button>
+</div>
+
+<div class="container hidden" id="quiz-view">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <h2 id="question-text"></h2>
+    <div id="choices-view"></div>
+</div>
+
+<div class="container hidden" id="result-view">
+    <h2>あなたの経営者タイプは…</h2>
+    <h1 id="ceo-name"></h1>
+    <p id="ceo-catchphrase"></p>
+    
+    <!-- 📊 【新機能】視認性抜群の横棒グラフ（バーチャート）エリア -->
+    <div class="chart-container">
+        <div class="chart-title">📊 あなたのビジネス報酬系バランス</div>
+        
+        <div class="bar-group">
+            <div class="bar-label"><span style="color: var(--accent-outcome);">成果指向 (Outcome)</span><span id="txt-outcome">0%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-outcome" id="bar-outcome"></div></div>
+        </div>
+
+        <div class="bar-group">
+            <div class="bar-label"><span style="color: var(--accent-process);">手順指向 (Process)</span><span id="txt-process">0%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-process" id="bar-process"></div></div>
+        </div>
+
+        <div class="bar-group">
+            <div class="bar-label"><span style="color: var(--accent-relation);">調和指向 (Relation)</span><span id="txt-relation">0%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-relation" id="bar-relation"></div></div>
+        </div>
+
+        <div class="bar-group">
+            <div class="bar-label"><span style="color: var(--accent-value);">実利指向 (Value)</span><span id="txt-value">0%</span></div>
+            <div class="bar-track"><div class="bar-fill fill-value" id="bar-value"></div></div>
+        </div>
+    </div>
+
+    <div id="ceo-description"></div>
+    <div id="ceo-reward"><strong>脳内報酬系：</strong><span id="ceo-reward-text"></span></div>
+    <div id="ceo-advice"><strong>他タイプへの攻略アドバイス：</strong><span id="ceo-advice-text"></span></div>
+    
+    <!-- ユーザーからの逆質問・感想受け取りフォーム -->
+    <div class="feedback-section" id="feedback-area">
+        <h3>💬 開発者への逆質問・フィードバック</h3>
+        <p>この診断を受けてみてどうでしたか？「ここをもっと解説してほしい！」「こういう時どうすればいい？」という質問や感想があれば教えてください！</p>
+        <textarea class="feedback-textarea" id="feedback-input" placeholder="例：織田信長タイプでしたが、家康タイプの部下とうまく話すコツを具体的に知りたいです！"></textarea>
+        <button class="btn-submit-feedback" id="submit-feedback-btn">送信する</button>
+    </div>
+
+
+<!-- ========================================= -->
+<!-- フィードバックフォーム -->
+<div class="feedback-section">
+
+  <h3>💬 開発者への逆質問・フィードバック</h3>
+
+  <input
+    type="email"
+    id="gia.assg001@gmail.com"
+    placeholder="メールアドレス"
+    required
+  >
+
+  <textarea
+    id="feedback-input"
+    rows="5"
+    placeholder="ご質問・ご感想をご入力ください"
+    required
+  ></textarea>
+
+  <button id="submit-feedback-btn">
+    送信する
+  </button>
+
+  <p id="feedback-message"></p>
+
+</div>
+
+<script>
+
+const GAS_URL =
+"https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXXXXXX/exec";
+
+document
+.getElementById("submit-feedback-btn")
+.addEventListener("click", async () => {
+
+  const email =
+    document.getElementById("user-email")
+    .value
+    .trim();
+
+  const feedback =
+    document.getElementById("feedback-input")
+    .value
+    .trim();
+
+  const resultType =
+    document.getElementById("result-title")
+      ? document.getElementById("result-title").innerText
+      : "未設定";
+
+  if (!email || !feedback) {
+
+    document.getElementById("feedback-message")
+      .textContent =
+      "メールアドレスと内容を入力してください";
+
+    return;
+  }
+
+  try {
+
+    await fetch(GAS_URL, {
+
+      method: "POST",
+
+      mode: "no-cors",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+
+        email: email,
+
+        result: resultType,
+
+        feedback: feedback
+
+      })
+
+    });
+
+    document.getElementById("feedback-message")
+      .textContent =
+      "送信ありがとうございました";
+
+    document.getElementById("user-email")
+      .value = "";
+
+    document.getElementById("feedback-input")
+      .value = "";
+
+  } catch (error) {
+
+    document.getElementById("feedback-message")
+      .textContent =
+      "送信に失敗しました";
+
+  }
+
+});
+
+</script>
+ <!-- ========================================= -->
+
+
+    <!-- もっと詳しく知りたい人のための誘導枠（CTA） -->
+    <div class="cta-section">
+        <p>💡 この診断の「対人交渉術」や深層心理をもっと学びたいですか？</p>
+        <a href="https://example.com/details" target="_blank" class="btn-link">もっと詳しく知りたい人はこちら</a>
+    </div>
+
+    <div class="action-group">
+        <button class="btn btn-restart" id="restart-button">もう一度する</button>
+        <button class="btn btn-download" id="download-button">保存する</button>
+        <button class="btn btn-share" id="share-button">シェアする</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "Q1. 新規プロジェクトの「大成功」の定義として、あなたの本音に最も近いものは？",
+            choices: [
+                { text: "競合を圧倒して市場シェアを奪い、自社（や自分）の名を業界に轟かせること", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "予測されるリスクをすべて未然に防ぎ、1ミリの狂いもなく計画通りに完遂すること", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "チームが一丸となり、社内や顧客との強固な信頼関係や次の繋がりが生まれること", score: { outcome: 0, process: 0, relation: 2, value: 0 } },
+                { text: "無駄な工数やコストを極限まで削ぎ落とし、過去最高の利益率（ROI）を叩き出すこと", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q2. 部下が「勝算は五分五分ですが熱意はあります」という提案を持ってきた。あなたが取るリアルな対応は？",
+            choices: [
+                { text: "「結果が出せなかったら即交代」の条件で、全権を渡して打席に立たせる", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "会社のルールに則り、まずは小さな検証ステップ（PoC）を刻んで進めさせる", score: { outcome: 0, process: 2, relation: 0, value: 1 } },
+                { text: "「お前の熱意を買った！」と、周囲も巻き込んでバックアップできる体制をすぐ作ってあげる", score: { outcome: 0, process: 0, relation: 2, value: 0 } },
+                { text: "リスクとリターンの試算をもう一度徹底的に詰め直させ、数字が合うまで突っぱねる", score: { outcome: 1, process: 1, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q3. 会議でチームの意見が真っ二つに対立して進まない。あなたが思わず取る立ち回りは？",
+            choices: [
+                { text: "「今回はこれで行く」と自分のトップダウンで最終決定を下し、強制的に行動へ移させる", score: { outcome: 2, process: 1, relation: 0, value: 0 } },
+                { text: "これまでの前例や社内規程、議事録をベースに、論理的な手順に沿って議論を整理する", score: { outcome: 0, process: 2, relation: 0, value: 1 } },
+                { text: "まずは双方の不満や背景を個別にじっくりヒアリングし、全員が納得する妥協点を探す", score: { outcome: 0, process: 0, relation: 2, value: 0 } },
+                { text: "どちらの案が「最もコストパフォーマンス（時間対効果）が高いか」を数字で比較して決める", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q4. あなたが仕事で「最高に脳汁が出る（報酬を感じる）」瞬間はどれ？",
+            choices: [
+                { text: "ライバルや難攻不落の目標を追い抜き、自分が「勝者」になったと確信した瞬間", score: { outcome: 3, process: 0, relation: 0, value: 1 } },
+                { text: "不確定要素がすべて消え去り、マニュアルや仕組み通りに物事がカチッと回り始めた瞬間", score: { outcome: 0, process: 3, relation: 1, value: 0 } },
+                { text: "「あなたのおかげです」と周囲から感謝され、利害を超えた強い絆や人望を感じた瞬間", score: { outcome: 0, process: 0, relation: 3, value: 0 } },
+                { text: "古い慣習や非効率を破壊し、圧倒的にスマートで合理的な価値を生み出した瞬間", score: { outcome: 1, process: 0, relation: 0, value: 3 } }
+            ]
+        },
+        {
+            question: "Q5. プロジェクトの進行中、あなたが最も「エネルギーを無駄に奪われている」と疲弊する瞬間は？",
+            choices: [
+                { text: "自分の裁量権が狭く、上の承認を待つだけの「足止め（待ち時間）」が発生しているとき", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "一度合意したはずの手順や前提条件が、周囲の思いつきやノリで事後変更されたとき", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "数字ばかりが追求され、現場のメンタルケアやチームの空気のギスギスが放置されているとき", score: { outcome: 0, process: 1, relation: 2, value: 0 } },
+                { text: "会議のための資料作成や、結論の出ない「とりあえず集まるだけの定例ミーティング」に付き合わされているとき", score: { outcome: 0, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q6. あなたが新しいツールや仕事の進め方を「導入しよう」と決める、最大の決定打はどこ？",
+            choices: [
+                { text: "他社を圧倒する強力な実績があり、自社を業界トップへ押し上げる武器になると確信したとき", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "既存のマニュアルや運用フローを壊さず、今の体制のまま確実に定着させられる再現性があるとき", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "実際に使う現場のメンバーから「これなら使いやすい」「みんなで楽しく共有できる」と声が上がったとき", score: { outcome: 0, process: 1, relation: 2, value: 0 } },
+                { text: "導入コストに対して、どれだけの労働時間や人件費が削減できるか、具体的な回収期間が証明されたとき", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q7. 競合他社が、こちらのシェアを奪うために「強力な低価格攻勢」を仕掛けてきた。どう対抗する？",
+            choices: [
+                { text: "さらにその下をいく価格か、圧倒的な物量（プロモーション）で相手を市場から叩き潰す", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "価格以外の差別化要因（品質やサポート、ブランド）を徹底的に磨く、確実な長期プロセスを作る", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "競合と不毛に戦って疲弊するのを避け、提携や業務分担など新しい関係性を模索する", score: { outcome: 0, process: 0, relation: 2, value: 1 } },
+                { text: "相手の価格攻勢の寿命をデータで分析し、その隙に次の高利益率なビジネスを裏で立ち上げる", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q8. あなたがチームに「たった一人だけ」新しいメンバーを迎え入れられるとしたら、誰を選ぶ？",
+            choices: [
+                { text: "多少チームの和を乱すリスクがあっても、自走してガツガツ新規の数字（成果）を引っ張ってくる人", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "派手さや爆発力はないが、任された管理業務やルーティンを1ミリの狂いもなく確実に遂行し続ける人", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "スキルは発展途上だが、愚痴や不満が出やすいチームのハブとなり、全体のモチベーションを高めてくれる人", score: { outcome: 0, process: 1, relation: 2, value: 0 } },
+                { text: "人情や空気に流されず、ファクトとデータに基づいて、業務のボトルネックを冷静に指摘・改善してくれる人", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q9. あなたの「取扱説明書」があるとしたら、そこに書かれている最も重要な注意書きは？",
+            choices: [
+                { text: "「プライドを傷つけられると牙を剥きます。最終的な主導権は私に持たせてください」", score: { outcome: 2, process: 0, relation: 0, value: 1 } },
+                { text: "「急な仕様変更や、責任だけを押し付けられる丸投げはパニックになります。逃げ道をください」", score: { outcome: 0, process: 2, relation: 1, value: 0 } },
+                { text: "「仲間外れや冷徹な個人主義の環境は病みます。信頼し合える温かい繋がりをください」", score: { outcome: 0, process: 1, relation: 2, value: 0 } },
+                { text: "「根拠のない感情論や、無駄な引き延ばしは激しく嫌悪します。ファクトとデータで話してください」", score: { outcome: 1, process: 0, relation: 0, value: 2 } }
+            ]
+        },
+        {
+            question: "Q10. 人生やビジネスにおいて、あなたが最終的に手に入れたい「最高の状態」はどれ？",
+            choices: [
+                { text: "誰にも文句を言わせない、圧倒的な実力・権限・実績をすべて手に入れた状態", score: { outcome: 3, process: 0, relation: 0, value: 1 } },
+                { text: "何の不安やトラブルもなく、盤石な仕組み（システム）の上で穏やかにコントロールできている状態", score: { outcome: 0, process: 3, relation: 1, value: 0 } },
+                { text: "深い人望に恵まれ、お互いを本気で信頼し合える大好きな仲間に囲まれて笑っている状態", score: { outcome: 0, process: 0, relation: 3, value: 0 } },
+                { text: "すべての無駄や非効率から解放され、最も洗練された本質的な価値を生み出し続けている状態", score: { outcome: 1, process: 0, relation: 0, value: 3 } }
+            ]
+        }
+    ];
+
+    const ceoData = {
+        outcome: { name: "織田信長 CEO", catchphrase: "「結果がすべて。四の五の言わずに市場を支配せよ」", description: "Outcome（成果・結果）指向のリーダー。目的達成のためには手段を選ばず、既存の秩序や感情を排除してでも最短距離で頂点を目指します。圧倒的な支配力と即断即決が強みです。", reward: "「自分が状況を支配し、目に見える成果を出した時」。その勲章（勝利）こそが最大のガソリンです。", advice: "「徳川家康タイプ（Process指向）」の慎重さは「無駄」に見えますが、彼らの「逃げ道を作る根回し」を先にやってあげると、彼らは安心して動き出し、あなたの勝利に貢献しますよ！" },
+        process: { name: "徳川家康 CEO", catchphrase: "「鳴かぬなら鳴くまで待とう。リスクゼロの仕組み経営」", description: "Process（手順・過程）指向のリーダー。成果よりも「ルール通りに、安全に、前例に倣って」物事が進むことに安心を感じます。石橋を叩いて渡る慎重さと、持続可能なシステムを構築する力があります。", reward: "「ルール通りに、安全に、前例に倣って物事が進んでいる」という安心感。プロセスが正しければ、計画通りの再現性を維持できるからです。", advice: "「織田信長タイプ（Outcome指向）」の強引さは「怖い」ですが、彼らは「結果」さえあれば納得します。あなたの得意な「安全なプロセス」を先に提示して、彼らが突っ込めないような外堀を固めれば、主導権を握れますよ！" },
+        relation: { name: "豊臣秀吉 CEO", catchphrase: "「全員が身内。懐を温めて人の心で巻き込め」", description: "Relation（人間関係・調和）指向のリーダー。周囲との調和や嫌われないこと、みんながハッピーであることを最優先にします。良好な人間関係を滑らかに構築し、チームの力を引き出す天才です。", reward: "「周囲との繋がりや、お互いの信頼。みんながハッピーであること」。個人プレーで100点を取るよりも、みんなで助け合ってチームで成果を出す方を好みます。", advice: "「坂本龍馬タイプ（Value指向）」の冷徹さは「人情がない」と感じますが、彼らは「実利・効率」で動きます。彼らの得意な「ロジック」を提示して、あなたの「人脈作り」と組み合わせれば、最強のチームが作れますよ！" },
+        value: { name: "坂本龍馬 CEO", catchphrase: "「古い慣習は即廃棄。数字と貿易で世界を動かせ」", description: "Value（実利・機能的価値）指向のリーダー。感情や人間関係を一切受け付けない、完全なロジック至上主義・費用対効果重視のタイプ。無駄が省かれ、システムが最も効率的に最適化されている状態に快感を覚えます。", reward: "「客観的な価値、費用対効果、スマートな仕組み」。感情や人間関係といった不確実なものを排除し、そこにある合理的な実利にのみ報酬を感じます。", advice: "「豊臣秀吉タイプ（Relation指向）」の感情論は「非合理的」ですが、彼らは「みんなの気持ち」を動かす力があります。あなたの立てた「ロジック」を、彼らに「みんなが納得する形」でプロモーションしてもらえば、あなたのやりたいことがより広く実現しますよ！" }
+    };
+
+    let scores = { outcome: 0, process: 0, relation: 0, value: 0 };
+    let currentQuestionIndex = 0;
+    let currentResult = null;
+
+    const startView = document.getElementById('start-view');
+    const quizView = document.getElementById('quiz-view');
+    const resultView = document.getElementById('result-view');
+    const questionText = document.getElementById('question-text');
+    const choicesView = document.getElementById('choices-view');
+    const progressFill = document.getElementById('progress-fill');
+    const ceoName = document.getElementById('ceo-name');
+    const ceoCatchphrase = document.getElementById('ceo-catchphrase');
+    const ceoDescription = document.getElementById('ceo-description');
+    const ceoRewardText = document.getElementById('ceo-reward-text');
+    const ceoAdviceText = document.getElementById('ceo-advice-text');
+    const feedbackInput = document.getElementById('feedback-input');
+    const feedbackArea = document.getElementById('feedback-area');
+
+    document.getElementById('start-button').addEventListener('click', startQuiz);
+    document.getElementById('restart-button').addEventListener('click', restartQuiz);
+    document.getElementById('download-button').addEventListener('click', downloadResult);
+    document.getElementById('share-button').addEventListener('click', shareResult);
+    document.getElementById('submit-feedback-btn').addEventListener('click', submitFeedback);
+
+    function startQuiz() {
+        startView.classList.add('hidden');
+        quizView.classList.remove('hidden');
+        showQuestion();
+    }
+
+    function restartQuiz() {
+        scores = { outcome: 0, process: 0, relation: 0, value: 0 };
+        currentQuestionIndex = 0;
+        currentResult = null;
+        feedbackInput.value = '';
+        feedbackArea.innerHTML = `<h3>💬 開発者への逆質問・フィードバック</h3><p>この診断を受けてみてどうでしたか？質問や感想があれば教えてください！</p><textarea class="feedback-textarea" id="feedback-input" placeholder="例：織田信長タイプでしたが、家康タイプの部下とうまく話すコツを具体的に知りたいです！"></textarea><button class="btn-submit-feedback" id="submit-feedback-btn" onclick="submitFeedback()">送信する</button>`;
+        
+        // メーターの数値を0%に戻す
+        ['outcome', 'process', 'relation', 'value'].forEach(type => {
+            document.getElementById(`bar-${type}`).style.width = '0%';
+            document.getElementById(`txt-${type}`).innerText = '0%';
+        });
+
+        resultView.classList.add('hidden');
+        startView.classList.remove('hidden');
+    }
+
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function showQuestion() {
+        const progressPercent = (currentQuestionIndex / quizData.length) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+
+        if (currentQuestionIndex < quizData.length) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.innerText = currentQuestion.question;
+            choicesView.innerHTML = '';
+            
+            const randomizedChoices = shuffleArray(currentQuestion.choices);
+
+            randomizedChoices.forEach(choice => {
+                const button = document.createElement('button');
+                button.innerText = choice.text;
+                button.classList.add('choice-button');
+                button.addEventListener('click', () => selectChoice(choice.score));
+                choicesView.appendChild(button);
+            });
+        } else {
+            showResult();
+        }
+    }
+
+    function selectChoice(choiceScore) {
+        for (let type in choiceScore) {
+            scores[type] += choiceScore[type];
+        }
+        currentQuestionIndex++;
+        showQuestion();
+    }
+
+    function showResult() {
+        quizView.classList.add('hidden');
+        resultView.classList.remove('hidden');
+
+        // 割合（パーセンテージ）の計算
+        const totalScore = scores.outcome + scores.process + scores.relation + scores.value || 1;
+        const percentages = {
+            outcome: Math.round((scores.outcome / totalScore) * 100),
+            process: Math.round((scores.process / totalScore) * 100),
+            relation: Math.round((scores.relation / totalScore) * 100),
+            value: Math.round((scores.value / totalScore) * 100)
+        };
+
+        // 🆕 【新機能】横棒グラフの数値をテキストに反映し、メーターをアニメーションで伸ばす
+        // setTimeoutを使うことで、画面が表示された直後にメーターがニョキッと伸びる演出になります
+        setTimeout(() => {
+            for (let type in percentages) {
+                document.getElementById(`txt-${type}`).innerText = `${percentages[type]}%`;
+                document.getElementById(`bar-${type}`).style.width = `${percentages[type]}%`;
+            }
+        }, 100);
+
+        // 最高得点タイプの判定
+        let highestType = 'outcome';
+        let highestScore = scores['outcome'];
+        for (let type in scores) {
+            if (scores[type] > highestScore) {
+                highestType = type;
+                highestScore = scores[type];
+            }
+        }
+
+        currentResult = ceoData[highestType];
+        ceoName.innerText = currentResult.name;
+        ceoCatchphrase.innerText = currentResult.catchphrase;
+        ceoDescription.innerText = currentResult.description;
+        ceoRewardText.innerText = currentResult.reward;
+        ceoAdviceText.innerText = currentResult.advice;
+
+        ceoName.style.color = `var(--accent-${highestType})`;
+    }
+
+    function submitFeedback() {
+        const input = document.getElementById('feedback-input').value.trim();
+        if(!input) {
+            alert('内容を入力してください！');
+            return;
+        }
+        feedbackArea.innerHTML = `<h3 style="color:#27ae60;">✓ 逆質問を受け付けました！</h3><p>貴重なフィードバックをありがとうございます！今後のコンテンツや個別アドバイスの参考にさせていただきます。</p>`;
+    }
+
+    function downloadResult() {
+        if (!currentResult) return;
+        const totalScore = scores.outcome + scores.process + scores.relation + scores.value || 1;
+        const pOutcome = Math.round((scores.outcome / totalScore) * 100);
+        const pProcess = Math.round((scores.process / totalScore) * 100);
+        const pRelation = Math.round((scores.relation / totalScore) * 100);
+        const pValue = Math.round((scores.value / totalScore) * 100);
+
+        const textContent = `【偉人CEO診断 プロ 結果】\n\nあなたのタイプ：\n${currentResult.name}\n${currentResult.catchphrase}\n\n■ あなたの報酬系バランス\n・成果指向 (Outcome): ${pOutcome}%\n・手順指向 (Process): ${pProcess}%\n・調和指向 (Relation): ${pRelation}%\n・実利指向 (Value): ${pValue}%\n\n■ 特徴\n${currentResult.description}\n\n■ 脳内報酬系\n${currentResult.reward}\n\n■ 攻略アドバイス\n${currentResult.advice}\n\n#偉人CEO診断`;
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${currentResult.name.replace(' ', '')}_診断結果.txt`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function shareResult() {
+        if (!currentResult) return;
+        const totalScore = scores.outcome + scores.process + scores.relation + scores.value || 1;
+        const pOutcome = Math.round((scores.outcome / totalScore) * 100);
+        const shareText = `【偉人CEO診断プロ】\n私のタイプは「${currentResult.name}」でした！(成果指向: ${pOutcome}%)\n${currentResult.catchphrase}\n\n#偉人CEO診断`;
+
+        if (navigator.share) {
+            navigator.share({ title: '偉人CEO診断結果', text: shareText }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(shareText)
+                .then(() => alert('診断結果をクリップボードにコピーしました！LINEやSNSに貼り付けてね！'))
+                .catch(() => alert('コピーに失敗しました。'));
+        }
+    }
+</script>
+
+</body>
+</html>
