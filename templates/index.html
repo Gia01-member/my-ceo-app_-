@@ -118,9 +118,9 @@
         }
         .bar-fill {
             height: 100%;
-            width: 0%; /* JSで動的に変更 */
+            width: 0%; 
             border-radius: 6px;
-            transition: width 1s cubic-bezier(0.1, 1, 0.1, 1); /* 開いた時にスッと伸びるアニメーション */
+            transition: width 1s cubic-bezier(0.1, 1, 0.1, 1); 
         }
         /* 各タイプ別のメーター色 */
         .fill-outcome { background-color: var(--accent-outcome); }
@@ -374,8 +374,8 @@
     ];
 
     const ceoData = {
-        outcome: { name: "織田信長 CEO", catchphrase: "「結果がすべて。四の五の言わずに市場を支配せよ」", description: "Outcome（成果・結果）指向のリーダー。目的達成のためには手段を選ばず、既存の秩序や感情を排除してでも最短距離で頂点を目指します。圧倒的な支配力と即断即決が強みです。", reward: "「自分が状況を支配し、目に見える成果を出した時」。その勲章（勝利）こそが最大のガソリンです。", advice: "「徳川家康タイプ（Process指向）」の慎重さは「無駄」に見えますが、彼らの「逃げ道を作る根回し」を先にやってあげると、彼らは安心して動き出し、あなたの勝利に貢献しますよ！" },
-        process: { name: "徳川家康 CEO", catchphrase: "「鳴かぬなら鳴くまで待とう。リスクゼロの仕組み経営」", description: "Process（手順・過程）指向のリーダー。成果よりも「ルール通りに、安全に、前例に倣って」物事が進むことに安心を感じます。石橋を叩いて渡る慎重さと、持続可能なシステムを構築する力があります。", reward: "「ルール通りに、安全に、前例に倣って物事が進んでいる」という安心感。プロセスが正しければ、計画通りの再現性を維持できるからです。", advice: "「織田信長タイプ（Outcome指向）」の強引さは「怖い」ですが、彼らは「結果」さえあれば納得します。あなたの得意な「安全なプロセス」を先に提示して、彼らが突っ込めないような外堀を固めれば、主導権を握れますよ！" },
+        outcome: { name: "織田信長 CEO", catchphrase: "「結果がすべて。四の五の言わずに市場を支配せよ」", description: "Outcome（成果・結果）指向のリーダー。目的達成のためには手段を選ばず、既存の秩序や感情を排除してでも最短距離で頂点を目指します。圧倒的な支配力と即断即決が強みです。", reward: "「自分が状況を支配し、目見える成果を出した時」。その勲章（勝利）こそが最大のガソリンです。", advice: "「徳川家康タイプ（Process指向）」の慎重さは「無駄」に見えますが、彼らの「逃げ道を作る根回し」を先にやってあげると、彼らは安心して動き出し、あなたの勝利に貢献しますよ！" },
+        process: { name: "徳川家康 CEO", catchphrase: "「鳴かぬなら鳴くまで待とう。リスクゼロの仕組み経営」", description: "Process（手順・過程）指向のリーダー。成果よりも「ルール通りに、安全に、前例に倣って」物事が進むことに安心を感じます。石橋を叩いて渡る慎重さと、持続可能なシステムを構築する力があります。", reward: "「ルール通りに、安全に、前例に倣って物事が進んでいる」という安心感。プロセスが正しければ、計画通りの再現性を維持できるからです。", advice: "「織田信長タイプ（Outcome指向）」の強引さは「怖い」ですが、彼らは「結果」さえあれば納得します。あなたの得意な「安全なプロセス」を先に提示して、彼らが突っ込めないような外堀を固めれば、主動権を握れますよ！" },
         relation: { name: "豊臣秀吉 CEO", catchphrase: "「全員が身内。懐を温めて人の心で巻き込め」", description: "Relation（人間関係・調和）指向のリーダー。周囲との調和や嫌われないこと、みんながハッピーであることを最優先にします。良好な人間関係を滑らかに構築し、チームの力を引き出す天才です。", reward: "「周囲との繋がりや、お互いの信頼。みんながハッピーであること」。個人プレーで100点を取るよりも、みんなで助け合ってチームで成果を出す方を好みます。", advice: "「坂本龍馬タイプ（Value指向）」の冷徹さは「人情がない」と感じますが、彼らは「実利・効率」で動きます。彼らの得意な「ロジック」を提示して、あなたの「人脈作り」と組み合わせれば、最強のチームが作れますよ！" },
         value: { name: "坂本龍馬 CEO", catchphrase: "「古い慣習は即廃棄。数字と貿易で世界を動かせ」", description: "Value（実利・機能的価値）指向のリーダー。感情や人間関係を一切受け付けない、完全なロジック至上主義・費用対効果重視のタイプ。無駄が省かれ、システムが最も効率的に最適化されている状態に快感を覚えます。", reward: "「客観的な価値、費用対効果、スマートな仕組み」。感情や人間関係といった不確実なものを排除し、そこにある合理的な実利にのみ報酬を感じます。", advice: "「豊臣秀吉タイプ（Relation指向）」の感情論は「非合理的」ですが、彼らは「みんなの気持ち」を動かす力があります。あなたの立てた「ロジック」を、彼らに「みんなが納得する形」でプロモーションしてもらえば、あなたのやりたいことがより広く実現しますよ！" }
     };
@@ -383,20 +383,9 @@
     let scores = { outcome: 0, process: 0, relation: 0, value: 0 };
     let currentQuestionIndex = 0;
     let currentResult = null;
+    let answersLog = []; // 📊 ユーザーの選択履歴を保存する配列
 
-    const startView = document.getElementById('start-view');
-    const quizView = document.getElementById('quiz-view');
-    const resultView = document.getElementById('result-view');
-    const questionText = document.getElementById('question-text');
-    const choicesView = document.getElementById('choices-view');
-    const progressFill = document.getElementById('progress-fill');
-    const ceoName = document.getElementById('ceo-name');
-    const ceoCatchphrase = document.getElementById('ceo-catchphrase');
-    const ceoDescription = document.getElementById('ceo-description');
-    const ceoRewardText = document.getElementById('ceo-reward-text');
-    const ceoAdviceText = document.getElementById('ceo-advice-text');
-
-    // 🔴 ご自身のGASウェブアプリURLに差し替えてください
+    // 🔴 ご自身の新しいGASウェブアプリURLに差し替えてください
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzNwy9-b2U8cb3MFqXSUew-qQ401gi4vCbEgsInNd9RQngB8lPfr8WLuJEhQLYqxpNtjg/exec";
 
     document.getElementById('start-button').addEventListener('click', startQuiz);
@@ -415,12 +404,12 @@
         scores = { outcome: 0, process: 0, relation: 0, value: 0 };
         currentQuestionIndex = 0;
         currentResult = null;
+        answersLog = []; // ログをリセット
         
         document.getElementById('user-email').value = '';
         document.getElementById('feedback-input').value = '';
         document.getElementById('feedback-message').textContent = '';
 
-        // メーターの数値を0%に戻す
         ['outcome', 'process', 'relation', 'value'].forEach(type => {
             document.getElementById(`bar-${type}`).style.width = '0%';
             document.getElementById(`txt-${type}`).innerText = '0%';
@@ -428,15 +417,6 @@
 
         resultView.classList.add('hidden');
         startView.classList.remove('hidden');
-    }
-
-    function shuffleArray(array) {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
     }
 
     function showQuestion() {
@@ -448,13 +428,12 @@
             questionText.innerText = currentQuestion.question;
             choicesView.innerHTML = '';
             
-            const randomizedChoices = shuffleArray(currentQuestion.choices);
-
-            randomizedChoices.forEach(choice => {
+            // 各設問での正確な回答を追跡するため固定順で生成
+            currentQuestion.choices.forEach((choice, index) => {
                 const button = document.createElement('button');
                 button.innerText = choice.text;
                 button.classList.add('choice-button');
-                button.addEventListener('click', () => selectChoice(choice.score));
+                button.addEventListener('click', () => selectChoice(choice.score, index));
                 choicesView.appendChild(button);
             });
         } else {
@@ -462,7 +441,10 @@
         }
     }
 
-    function selectChoice(choiceScore) {
+    function selectChoice(choiceScore, choiceIndex) {
+        // 何番目の選択肢を選んだか記録（1〜4）
+        answersLog.push(choiceIndex + 1); 
+
         for (let type in choiceScore) {
             scores[type] += choiceScore[type];
         }
@@ -474,7 +456,6 @@
         quizView.classList.add('hidden');
         resultView.classList.remove('hidden');
 
-        // 割合（パーセンテージ）の計算
         const totalScore = scores.outcome + scores.process + scores.relation + scores.value || 1;
         const percentages = {
             outcome: Math.round((scores.outcome / totalScore) * 100),
@@ -483,7 +464,6 @@
             value: Math.round((scores.value / totalScore) * 100)
         };
 
-        // メーターをアニメーションで伸ばす
         setTimeout(() => {
             for (let type in percentages) {
                 document.getElementById(`txt-${type}`).innerText = `${percentages[type]}%`;
@@ -491,7 +471,6 @@
             }
         }, 100);
 
-        // 最高得点タイプの判定
         let highestType = 'outcome';
         let highestScore = scores['outcome'];
         for (let type in scores) {
@@ -511,11 +490,17 @@
         ceoName.style.color = `var(--accent-${highestType})`;
     }
 
-    // 🛠️ 修正・最適化したフィードバック送信処理
+    // 🛠️ 選択結果＋詳細％を含むフィードバック送信処理
     async function submitFeedback() {
         const email = document.getElementById("user-email").value.trim();
         const feedback = document.getElementById("feedback-input").value.trim();
         const resultType = currentResult ? currentResult.name : "未設定";
+
+        const totalScore = scores.outcome + scores.process + scores.relation + scores.value || 1;
+        const pOutcome = Math.round((scores.outcome / totalScore) * 100);
+        const pProcess = Math.round((scores.process / totalScore) * 100);
+        const pRelation = Math.round((scores.relation / totalScore) * 100);
+        const pValue = Math.round((scores.value / totalScore) * 100);
 
         if (!email || !feedback) {
             document.getElementById("feedback-message").style.color = "var(--secondary)";
@@ -530,10 +515,14 @@
             const payload = {
                 email: email,
                 result: resultType,
-                feedback: feedback
+                feedback: feedback,
+                pOutcome: pOutcome,
+                pProcess: pProcess,
+                pRelation: pRelation,
+                pValue: pValue,
+                answers: answersLog // 📊 Q1〜Q10の選択肢データを配列で格納
             };
 
-            // CORSエラーを回避するため text/plain でJSON文字列を送信
             await fetch(GAS_URL, {
                 method: "POST",
                 headers: {
@@ -542,7 +531,6 @@
                 body: JSON.stringify(payload)
             });
 
-            // no-cors または text/plain の仕様上、処理完了として次へ進める
             document.getElementById("feedback-message").style.color = "#27ae60";
             document.getElementById("feedback-message").textContent = "送信ありがとうございました！";
             document.getElementById("user-email").value = "";
